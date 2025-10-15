@@ -2,15 +2,19 @@
 <html lang="en">
 <meta charset="utf-8" />
 <title>Test20251015: Confirm Dialog → Navigation</title>
-<h1>Test A</h1>
+<h1>Test 20251015</h1>
 <p>This page shows a confirm dialog. Click “OK” to navigate to the next page.</p>
 
 <button id="go">Go to next page</button>
-
 <script>
   document.getElementById('go').addEventListener('click', () => {
     if (confirm('Click OK to go to the next page. Are you sure?')) {
-      location.href = 'done.html';
+      // Mark that the user passed the confirmation
+      sessionStorage.setItem('passed_testA', '1');
+      // Optional: one-time nonce to make URL guessing harder
+      const nonce = Math.random().toString(36).slice(2);
+      sessionStorage.setItem('testA_nonce', nonce);
+      location.href = 'done.html?nonce=' + encodeURIComponent(nonce);
     }
   });
 </script>

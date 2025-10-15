@@ -2,7 +2,41 @@
 <html lang="en">
 <meta charset="utf-8" />
 <title>Test 20251015 Complete</title>
-<h1>✅ Test 20251015 Complete</h1>
-<p>You reached this page after clicking “OK” on the confirm dialog.</p>
-<a href="../">Back to Home</a>
+<style>
+  .error {
+    padding: 16px; margin: 24px; border: 1px solid #f00; background: #ffecec;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  }
+</style>
+<noscript><div class="error">JavaScript is required for this test.</div></noscript>
+<body>
+<script>
+  // Guard: must have come from the confirm flow in this tab
+  const ok = sessionStorage.getItem('passed_testA') === '1';
+  const urlNonce = new URLSearchParams(location.search).get('nonce');
+  const storedNonce = sessionStorage.getItem('testA_nonce');
+
+  if (!ok || !urlNonce || urlNonce !== storedNonce) {
+    // Show an error instead of the success content
+    document.body.innerHTML = `
+      <div class="error">
+        <strong>Access error</strong><br>
+        You navigated to this page directly. Please start from
+        <a href="../">the Test Portal</a> and use <em>Test 20251015</em>.
+      </div>`;
+    // Surface an actual JS error too (useful for Playwright/console logs)
+    throw new Error('Blocked: direct navigation to Test 20251015 done page');
+  }
+
+  // Passed the guard: clean up (one-time) and show success UI
+  sessionStorage.removeItem('passed_testA');
+  sessionStorage.removeItem('testA_nonce');
+
+  document.body.innerHTML = `
+    <h1>✅ Test 20251015 Complete</h1>
+    <p>You reached this page after clicking “OK” on the confirm dialog.</p>
+    <a href="../">Back to Home</a>
+  `;
+</script>
+</body>
 </html>
