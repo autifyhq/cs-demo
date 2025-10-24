@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>標準の確認ダイアログ</title>
+</head>
+<body>
+
+    <!-- メインコンテンツ -->
+    <div>
+        <!-- ボタンからデザイン関連のクラスを削除 -->
+        <button id="openConfirmButton">
+            操作を実行する
+        </button>
+    </div>
+
+    <!-- 結果を表示するためのpタグを追加 -->
+    <p id="resultMessage"></p>
+
+    <!-- 
+      カスタムモーダルのHTMLはすべて削除しました。
+      代わりにJavaScriptの confirm() を使用します。
+    -->
+
+    <script>
+        // 必要な要素を取得します
+        const openConfirmButton = document.getElementById('openConfirmButton');
+        // 結果を表示するためのpタグを取得
+        const resultMessage = document.getElementById('resultMessage');
+
+        // 「操作を実行する」ボタンが押されたときの処理
+        openConfirmButton.addEventListener('click', () => {
+            
+            // ユーザーが希望したテキスト（\n で改行します）
+            const message = "XXをします。よろしいですか？\nYYの場合はキャンセルボタンを押してください。";
+
+            // ブラウザ標準の confirm() ダイアログを表示します
+            // ユーザーが「OK」を押すと true、「キャンセル」を押すと false が返ります
+            const result = window.confirm(message);
+
+            // 結果をコンソールではなく、Webページ上のpタグに表示します
+            if (result) {
+                resultMessage.textContent = 'OKがクリックされました';
+            } else {
+                resultMessage.textContent = 'キャンセルがクリックされました';
+            }
+        });
+    </script>
+
+</body>
+</html>
+
