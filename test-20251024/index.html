@@ -135,7 +135,7 @@
     <table>
         <thead>
             <tr>
-                <th>#</th>
+                <th class="sortable" data-column-index="0">#</th>
                 <th class="sortable" data-column-index="1">食材管理番号</th>
                 <th class="sortable" data-column-index="2">食材名</th>
                 <th class="sortable" data-column-index="3">在庫状況</th>
@@ -257,17 +257,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 並び替え機能 ---
     const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
 
-    const comparer = (idx, asc) => (a, b) => ((v1, v2) => 
-        v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
-    )(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
+    const comparer = (idx, asc) => (a, b) => {
+        let v1 = getCellValue(asc ? a : b, idx);
+        let v2 = getCellValue(asc ? b : a, idx);
+
+        if (v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2)) {
+            return parseFloat(v1) - parseFloat(v2);
+        }
+        
+        return v1.toString().localeCompare(v2);
+    };
 
     document.querySelectorAll('th.sortable').forEach(th => {
-        th.addEventListener('click', (() => {
+        // ▼▼▼ ここを修正しました ▼▼▼
+        th.addEventListener('click', () => {
             const table = th.closest('table');
             const tbody = table.querySelector('tbody');
             const columnIndex = parseInt(th.dataset.columnIndex);
             
-            // 他のヘッダーからソートクラスを削除
             table.querySelectorAll('th.sortable').forEach(h => {
                 if(h !== th) h.classList.remove('asc', 'desc');
             });
@@ -279,7 +286,8 @@ document.addEventListener('DOMContentLoaded', () => {
             Array.from(tbody.querySelectorAll('tr'))
                 .sort(comparer(columnIndex, !currentIsAsc))
                 .forEach(tr => tbody.appendChild(tr));
-        }));
+        });
+        // ▲▲▲ ここを修正しました ▲▲▲
     });
 
     // --- フィルター機能 ---
@@ -289,7 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const applyFilters = () => {
         const filterValues = Array.from(filterInputs).map(input => ({
-            value: input.value, // 日本語を扱うためtoLowerCase()を削除
+            value: input.value,
             index: parseInt(input.dataset.columnIndex)
         }));
 
@@ -310,7 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     filterInputs.forEach(input => {
         input.addEventListener('keyup', applyFilters);
-        input.addEventListener('change', applyFilters); // select要素用
+        input.addEventListener('change', applyFilters);
     });
 });
 </script>
