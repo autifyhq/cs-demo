@@ -4,9 +4,19 @@
   <meta charset="utf-8" />
   <title>Next Page</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 24px; }
+  </style>
 </head>
 <body>
   <h1>Next Page</h1>
-  <p>親ページはここに遷移しました。子ウィンドウは自動で閉じられるはずです。</p>
+  <p>親ページの遷移が完了しました。小ウィンドウはまもなく自動で閉じます。</p>
+
+  <script>
+    const CH_NAME = 'demo-popup-flow';
+    const ch = new BroadcastChannel(CH_NAME);
+    // ページロード完了後の合図（少し遅延して送ると安定）
+    setTimeout(() => ch.postMessage('parent-loaded'), 50);
+  </script>
 </body>
 </html>

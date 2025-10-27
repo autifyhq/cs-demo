@@ -4,28 +4,30 @@
   <meta charset="utf-8" />
   <title>Child (Popup)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 16px; }
+  </style>
 </head>
 <body>
   <h2>Child Window</h2>
-  <p>親ページに状態を通知し、クローズ指示で自動的に閉じます。</p>
+  <p>親ページの遷移完了を待っています…（完了後、自動で閉じます）</p>
 
   <script>
-    // 親に「準備できた」を通知
-    if (window.opener) {
-      // 実運用では第二引数に自ドメインを指定（例: 'https://example.com'）
-      window.opener.postMessage('child-ready', '*');
-    }
+    const CH_NAME = 'demo-popup-flow';
+    const ch = new BroadcastChannel(CH_NAME);
 
-    // 親から「close」メッセージが来たら自分を閉じる
-    window.addEventListener('message', (e) => {
-      if (e.data === 'close') {
-        // 自分で開かれたウィンドウなので close が許可される
-        window.close();
+    // 自分の準備完了を親に通知
+    ch.postMessage('child-ready');
+
+    // 親（next.html）がロード完了を通知してきたら自動クローズ
+    ch.addEventListener('message', (e) => {
+      if (e.data === 'parent-loaded') {
+        try { window.close(); } catch {}
       }
     });
 
-    // 追加例：一定時間後に自律クローズするフォールバック
-    // setTimeout(() => { try { window.close(); } catch (_) {} }, 4000);
+    // 念のためのフォールバック（数秒後に自律クローズ）
+    setTimeout(() => { try { window.close(); } catch {} }, 7000);
   </script>
 </body>
 </html>
