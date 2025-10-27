@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>Parent</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>button{font-size:16px;padding:10px 16px}</style>
+</head>
+<body>
+  <h1>Parent Page</h1>
+  <p>ボタンを押すと確認→小ウィンドウ→親ページ遷移→小ウィンドウ自動クローズの流れを再現します。</p>
+  <button id="go">実行</button>
+
+  <script>
+    const NEXT_URL = 'next.html';        // 親の遷移先
+    const CHILD_URL = 'child.html';      // 子ウィンドウの遷移先（同一オリジン）
+
+    document.getElementById('go').addEventListener('click', () => {
+      if (!window.confirm('処理を実行しますか？')) return;
+
+      // ユーザー操作直後に about:blank を同期で開く（ブロック回避）
+      const popup = window.open('about:blank', 'childWin',
+        'width=420,height=360,noopener,noreferrer');
+
+      if (!popup) {
+        alert('ポップアップがブロックされました。ブラウザ設定を確認してください。');
+        return;
+      }
+
+      // すぐに同一オリジンの子ページへ遷移（about:blank が一瞬見える可能性あり）
+      try {
+        popup.document.write('<p>Loading...</p>');
+      } catch (_) { /* たまに書けない環境もあるので無視 */ }
+      popup.location.href = CHILD_URL;
+
+      // 親→子の連携：子から「ready」が届いたら親を遷移し、子に「close」を通知
+      const onMessage = (e) => {
+        // 実際は e.origin を自ドメインに限定してください（セキュリティ対策）
+        if (e.data === 'child-ready') {
+          window.removeEventListener('message', onMessage);
+          // 親を遷移させる（ここで unload/pagehide が走る）
+          window.location.href = NEXT_URL;
+          // 親遷移直後でもキューに乗る想定のフォローとして close 指示を送る
+          try { popup.postMessage('close', '*'); } catch (_) {}
+        }
+      };
+      window.addEventListener('message', onMessage);
+
+      // フォールバック：親が離脱する際に念のため子を閉じる
+      window.addEventListener('pagehide', () => {
+        try { if (popup && !popup.closed) popup.close(); } catch (_) {}
+      }, { once: true });
+    });
+  </script>
+</body>
+</html>

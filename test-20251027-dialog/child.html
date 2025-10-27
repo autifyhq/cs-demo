@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>Child (Popup)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body>
+  <h2>Child Window</h2>
+  <p>親ページに状態を通知し、クローズ指示で自動的に閉じます。</p>
+
+  <script>
+    // 親に「準備できた」を通知
+    if (window.opener) {
+      // 実運用では第二引数に自ドメインを指定（例: 'https://example.com'）
+      window.opener.postMessage('child-ready', '*');
+    }
+
+    // 親から「close」メッセージが来たら自分を閉じる
+    window.addEventListener('message', (e) => {
+      if (e.data === 'close') {
+        // 自分で開かれたウィンドウなので close が許可される
+        window.close();
+      }
+    });
+
+    // 追加例：一定時間後に自律クローズするフォールバック
+    // setTimeout(() => { try { window.close(); } catch (_) {} }, 4000);
+  </script>
+</body>
+</html>
