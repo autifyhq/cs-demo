@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <title>確認→3秒後にアラート デモ</title>
+  <title>確認→10秒後にアラート デモ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", sans-serif; line-height: 1.6; padding: 2rem; }
@@ -14,9 +14,9 @@
 </head>
 <body>
   <div class="wrap">
-    <h1>確認 → 3秒後にアラート</h1>
+    <h1>確認 → 10秒後にアラート</h1>
     <p>下のボタンをクリックするとブラウザのネイティブ <code>confirm()</code> ダイアログが表示されます。<br>
-       「OK」を押すと3秒後に <code>alert()</code> が出ます（「キャンセル」を押した場合は何もしません）。</p>
+       「OK」を押すと10秒後に <code>alert()</code> が出ます（「キャンセル」を押した場合は何もしません）。</p>
 
     <button id="confirmBtn">確認ダイアログを表示</button>
 
@@ -35,10 +35,10 @@
           const ok = confirm(confirmMessage);
           if (!ok) return;
 
-          // OK の場合だけ 3 秒後に alert を表示
+          // OK の場合だけ 10 秒後に alert を表示
           setTimeout(() => {
             alert(alertMessage);
-          }, 3000);
+          }, 10000);
         });
       })();
     </script>
