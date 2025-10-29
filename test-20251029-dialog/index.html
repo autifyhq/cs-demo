@@ -1,14 +1,14 @@
 <!doctype html>
-<html lang="ja">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>確認とアラート（シンプル版）</title>
+  <title>Confirm and Alert (Simple Version)</title>
 </head>
 <body>
-  <h1>確認とアラートのテスト</h1>
-  <button id="startBtn">確認ダイアログを表示</button>
+  <h1>Confirm and Alert Demo</h1>
+  <button id="startBtn">Show Confirm Dialog</button>
 
-  <h2>操作ログ</h2>
+  <h2>Action Log</h2>
   <div id="log" style="white-space: pre-line; border: 1px solid #ccc; padding: 10px; width: 90%; max-width: 600px; min-height: 100px;"></div>
 
   <script>
@@ -21,17 +21,17 @@
     }
 
     startBtn.addEventListener('click', () => {
-      const confirmResult = confirm('この操作を実行しますか？');
+      const confirmResult = confirm('Do you want to proceed?');
       if (confirmResult) {
-        addLog('確認ダイアログ：OKが押されました');
+        addLog('Confirm dialog: OK was pressed');
         try {
-          alert('OKが押されました。これが2回目のアラートです。');
-          addLog('アラートダイアログ：OKが押されました');
+          alert('OK was pressed. This is the second alert dialog.');
+          addLog('Alert dialog: OK was pressed');
         } catch (e) {
-          addLog('アラートダイアログ：閉じられました');
+          addLog('Alert dialog: The alert was closed without pressing OK');
         }
       } else {
-        addLog('確認ダイアログ：キャンセルが押されました');
+        addLog('Confirm dialog: Cancel was pressed');
       }
     });
   </script>
