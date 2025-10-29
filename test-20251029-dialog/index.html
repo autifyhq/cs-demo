@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Confirm and Alert (Simple Version)</title>
+  <title>Two Confirms and One Alert</title>
 </head>
 <body>
-  <h1>Confirm and Alert Demo</h1>
-  <button id="startBtn">Show Confirm Dialog</button>
+  <h1>Two Confirms → One Alert</h1>
+  <button id="startBtn">Start Dialog Sequence</button>
 
   <h2>Action Log</h2>
   <div id="log" style="white-space: pre-line; border: 1px solid #ccc; padding: 10px; width: 90%; max-width: 600px; min-height: 100px;"></div>
@@ -21,18 +21,25 @@
     }
 
     startBtn.addEventListener('click', () => {
-      const confirmResult = confirm('Do you want to proceed?');
-      if (confirmResult) {
-        addLog('Confirm dialog: OK was pressed');
-        try {
-          alert('OK was pressed. This is the second alert dialog.');
-          addLog('Alert dialog: OK was pressed');
-        } catch (e) {
-          addLog('Alert dialog: The alert was closed without pressing OK');
-        }
-      } else {
-        addLog('Confirm dialog: Cancel was pressed');
+      // First confirm
+      const firstConfirm = confirm('First confirm: Do you want to continue?');
+      if (!firstConfirm) {
+        addLog('First confirm: Cancel was pressed');
+        return;
       }
+      addLog('First confirm: OK was pressed');
+
+      // Second confirm
+      const secondConfirm = confirm('Second confirm: Are you sure you want to proceed?');
+      if (!secondConfirm) {
+        addLog('Second confirm: Cancel was pressed');
+        return;
+      }
+      addLog('Second confirm: OK was pressed');
+
+      // Third alert
+      alert('You pressed OK on both confirms. This is the final alert!');
+      addLog('Alert: The alert was closed');
     });
   </script>
 </body>
