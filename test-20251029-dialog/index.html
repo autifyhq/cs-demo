@@ -2,38 +2,145 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <title>確認→すぐアラート デモ</title>
+  <title>確認→アラート（操作ログ付き）</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
+    :root { color-scheme: light dark; }
     body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", sans-serif; line-height: 1.6; padding: 2rem; }
-    .wrap { max-width: 640px; margin: 0 auto; }
-    button { padding: .75rem 1rem; border: 1px solid #ccc; border-radius: .75rem; cursor: pointer; font-size: 1rem; }
+    .wrap { max-width: 720px; margin: 0 auto; }
+    button { padding: .7rem 1rem; border: 1px solid #ccc; border-radius: .75rem; cursor: pointer; font-size: 1rem; }
     button:hover { background: #f6f6f6; }
-    code { background: #f3f3f3; padding: .1rem .3rem; border-radius: .3rem; }
+    .row { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    #log { list-style: none; padding: 0; margin: 1rem 0 0; }
+    #log li { padding: .5rem .75rem; border: 1px solid #e5e5e5; border-radius: .5rem; margin-bottom: .5rem; }
+    dialog { border: none; border-radius: 1rem; padding: 1.25rem 1.25rem 1rem; box-shadow: 0 10px 30px rgba(0,0,0,.15); }
+    dialog::backdrop { backdrop-filter: blur(2px); }
+    dialog > form > menu { display: flex; gap: .5rem; justify-content: flex-end; margin: 1rem 0 0; padding: 0; }
+    .close-x { position: absolute; right: .5rem; top: .25rem; border: none; background: transparent; font-size: 1.25rem; cursor: pointer; }
+    .muted { opacity: .7; font-size: .9rem; }
+    .time { font-variant-numeric: tabular-nums; opacity: .7; margin-right: .5rem; }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>確認 → すぐアラート</h1>
-    <p>ボタンをクリックすると <code>confirm()</code> が表示され、「OK」を押すとすぐに <code>alert()</code> が出ます。</p>
+    <h1>確認 → アラート（操作ログをページに残す）</h1>
+    <p class="muted">「フローを開始」→ 確認ダイアログ（OK/キャンセル）→ OKの場合は直後にアラート（OK/閉じる）。<br>各操作結果は下のログに追記され、残り続けます。</p>
 
-    <button id="confirmBtn">確認ダイアログを表示</button>
+    <div class="row">
+      <button id="startBtn">フローを開始</button>
+      <button id="clearBtn" title="ログを消去">ログをクリア</button>
+    </div>
 
-    <script>
-      (function () {
-        const btn = document.getElementById('confirmBtn');
-
-        btn.addEventListener('click', () => {
-          const confirmMessage = 'この操作を実行しますか？\nOKで続行、キャンセルで中止します。';
-          const alertMessage = 'OKが押されたので、すぐにこのアラートを表示しました。';
-
-          const ok = confirm(confirmMessage);
-          if (!ok) return;
-
-          alert(alertMessage);
-        });
-      })();
-    </script>
+    <ul id="log" aria-live="polite" aria-relevant="additions"></ul>
   </div>
+
+  <!-- 確認ダイアログ -->
+  <dialog id="confirmDlg">
+    <button class="close-x" type="button" aria-label="閉じる">×</button>
+    <form method="dialog">
+      <h2>確認</h2>
+      <p>この操作を実行しますか？<br>OKで続行、キャンセルで中止します。</p>
+      <menu>
+        <button value="cancel">キャンセル</button>
+        <button value="ok">OK</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <!-- アラートダイアログ（OK と「閉じる」を判別） -->
+  <dialog id="alertDlg">
+    <button class="close-x" type="button" aria-label="閉じる">×</button>
+    <form method="dialog">
+      <h2>お知らせ</h2>
+      <p>OK を押すと続行します。× / ESC / 背景クリックでも閉じられます。</p>
+      <menu>
+        <button value="ok" autofocus>OK</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <script>
+    (function () {
+      const startBtn = document.getElementById('startBtn');
+      const clearBtn = document.getElementById('clearBtn');
+      const logList  = document.getElementById('log');
+
+      const confirmDlg = document.getElementById('confirmDlg');
+      const alertDlg   = document.getElementById('alertDlg');
+
+      // ログ出力（新しいものを上に）
+      function addLog(message) {
+        const li = document.createElement('li');
+        const t = new Date();
+        const hh = String(t.getHours()).padStart(2, '0');
+        const mm = String(t.getMinutes()).padStart(2, '0');
+        const ss = String(t.getSeconds()).padStart(2, '0');
+        li.innerHTML = `<span class="time">${hh}:${mm}:${ss}</span>${message}`;
+        logList.prepend(li);
+      }
+
+      // 背景クリックで閉じる（returnValue を 'dismiss' に）
+      function makeBackdropDismissible(dlg) {
+        dlg.addEventListener('click', (e) => {
+          const rect = dlg.getBoundingClientRect();
+          const clickedInDialog =
+            e.clientX >= rect.left && e.clientX <= rect.right &&
+            e.clientY >= rect.top  && e.clientY <= rect.bottom;
+          if (!clickedInDialog && dlg.open) {
+            dlg.close('dismiss');
+          }
+        });
+      }
+
+      // × ボタンで閉じる
+      function wireCloseX(dlg) {
+        const x = dlg.querySelector('.close-x');
+        x?.addEventListener('click', () => dlg.close('dismiss'));
+      }
+
+      makeBackdropDismissible(confirmDlg);
+      makeBackdropDismissible(alertDlg);
+      wireCloseX(confirmDlg);
+      wireCloseX(alertDlg);
+
+      // フロー開始: 確認ダイアログを表示
+      startBtn.addEventListener('click', () => {
+        confirmDlg.showModal();
+      });
+
+      // 確認結果
+      confirmDlg.addEventListener('close', () => {
+        const v = confirmDlg.returnValue; // 'ok' | 'cancel' | 'dismiss' | ''
+        if (v === 'ok') {
+          addLog('確認ダイアログ：OK が押されました');
+          // OK の直後にアラートを表示
+          alertDlg.showModal();
+        } else if (v === 'cancel') {
+          addLog('確認ダイアログ：キャンセルが押されました');
+        } else {
+          addLog('確認ダイアログ：×/ESC/背景クリックなどで閉じられました');
+        }
+      });
+
+      // アラート結果
+      alertDlg.addEventListener('close', () => {
+        const v = alertDlg.returnValue; // 'ok' | 'dismiss' | ''
+        if (v === 'ok') {
+          addLog('アラートダイアログ：OK が押されました');
+        } else {
+          addLog('アラートダイアログ：OK 以外の方法で閉じられました（×/ESC/背景クリック 等）');
+        }
+      });
+
+      // ログクリア
+      clearBtn.addEventListener('click', () => {
+        logList.innerHTML = '';
+        addLog('ログをクリアしました');
+      });
+
+      // キーボード ESC でも close イベントが発火（returnValue は ''）
+      // そのまま上の close ハンドラで扱います。
+    })();
+  </script>
 </body>
 </html>
