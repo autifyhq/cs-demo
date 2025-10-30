@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Confirm Once → Two Alerts</title>
+</head>
+<body>
+  <h1>Confirm Once → Two Alerts</h1>
+  <button id="startBtn">Start Dialog Sequence</button>
+
+  <h2>Action Log</h2>
+  <div id="log" style="white-space: pre-line; border: 1px solid #ccc; padding: 10px; width: 90%; max-width: 600px; min-height: 100px;"></div>
+
+  <script>
+    const logDiv = document.getElementById('log');
+    const startBtn = document.getElementById('startBtn');
+
+    function addLog(text) {
+      const time = new Date().toLocaleTimeString();
+      logDiv.textContent += `[${time}] ${text}\n`;
+    }
+
+    startBtn.addEventListener('click', () => {
+      const confirmed = confirm('Do you want to continue?');
+      if (!confirmed) {
+        addLog('Confirm dialog: Cancel was pressed');
+        return;
+      }
+
+      addLog('Confirm dialog: OK was pressed');
+
+      // First alert
+      alert('First alert: You pressed OK on the confirm dialog.');
+      addLog('First alert: OK was pressed');
+
+      // Second alert
+      alert('Second alert: This is shown after the first alert.');
+      addLog('Second alert: OK was pressed');
+    });
+  </script>
+</body>
+</html>
