@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Era Selection with Confirmation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    label {
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+    select {
+      padding: 4px 8px;
+    }
+    .info {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Please select an era</h1>
+
+  <label for="eraSelect">Era:</label>
+  <select id="eraSelect" name="era">
+    <option value="">-- Please choose --</option>
+    <option value="taisho">大正</option>
+    <option value="showa">昭和</option>
+    <option value="heisei">平成</option>
+    <option value="reiwa">令和</option>
+  </select>
+
+  <div class="info" id="infoArea"></div>
+
+  <script>
+    // Get the selected era from the current URL
+    const params = new URLSearchParams(window.location.search);
+    const currentEra = params.get("era");
+    const select = document.getElementById("eraSelect");
+    const infoArea = document.getElementById("infoArea");
+
+    // Reflect the selected era on page load
+    if (currentEra) {
+      select.value = currentEra;
+      infoArea.textContent = "Currently selected era: " + eraToLabel(currentEra);
+    } else {
+      infoArea.textContent = "No era selected yet.";
+    }
+
+    // When the selection changes, show a confirmation dialog
+    select.addEventListener("change", function () {
+      const era = this.value;
+      if (!era) {
+        // Reset selection
+        window.location.search = "";
+        return;
+      }
+
+      const label = eraToLabel(era);
+      const confirmed = confirm("Do you want to switch to " + label + "?");
+
+      if (confirmed) {
+        // If OK is pressed, reload with ?era=...
+        window.location.search = "?era=" + encodeURIComponent(era);
+      } else {
+        // If Cancel, revert selection
+        this.value = currentEra || "";
+      }
+    });
+
+    function eraToLabel(era) {
+      switch (era) {
+        case "taisho":
+          return "大正";
+        case "showa":
+          return "昭和";
+        case "heisei":
+          return "平成";
+        case "reiwa":
+          return "令和";
+        default:
+          return era;
+      }
+    }
+  </script>
+</body>
+</html>
