@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Two Dialog Demo Buttons</title>
+</head>
+<body>
+  <h1>Dialog Demo</h1>
+
+  <p>
+    <button id="btn1">Button 1: confirm → alert</button>
+  </p>
+  <p>
+    <button id="btn2">Button 2: long flow (confirm → confirm → alert → confirm → confirm → alert)</button>
+  </p>
+
+  <h2>Action Log</h2>
+  <div id="log" style="white-space: pre-line; border: 1px solid #ccc; padding: 10px; width: 90%; max-width: 700px; min-height: 120px;"></div>
+
+  <script>
+    const logDiv = document.getElementById('log');
+    const btn1 = document.getElementById('btn1');
+    const btn2 = document.getElementById('btn2');
+
+    function addLog(text) {
+      const time = new Date().toLocaleTimeString();
+      logDiv.textContent += `[${time}] ${text}\n`;
+    }
+
+    // Button 1:
+    // click → confirm → (OK or Cancel) → alert
+    btn1.addEventListener('click', () => {
+      const c = confirm('Button 1 - Confirm: Do you want to continue?');
+      if (c) {
+        addLog('Button 1: Confirm → OK');
+      } else {
+        addLog('Button 1: Confirm → Cancel');
+      }
+
+      alert('Button 1 - Alert: This shows regardless of OK/Cancel.');
+      addLog('Button 1: Alert → closed');
+    });
+
+    // Button 2:
+    // click
+    // 1) confirm A
+    // 2) regardless → confirm B
+    // 3) regardless → alert 1
+    // 4) when alert 1 is closed → confirm C
+    // 5) regardless → confirm D
+    // 6) regardless → alert 2
+    btn2.addEventListener('click', () => {
+      // 1) First confirm
+      const c1 = confirm('Button 2 - Confirm 1: Do you want to start this flow?');
+      if (c1) {
+        addLog('Button 2: Confirm 1 → OK');
+      } else {
+        addLog('Button 2: Confirm 1 → Cancel');
+      }
+
+      // 2) Second confirm (always)
+      const c2 = confirm('Button 2 - Confirm 2: Continue to the next step?');
+      if (c2) {
+        addLog('Button 2: Confirm 2 → OK');
+      } else {
+        addLog('Button 2: Confirm 2 → Cancel');
+      }
+
+      // 3) First alert (always)
+      alert('Button 2 - Alert 1: First alert in the flow.');
+      addLog('Button 2: Alert 1 → closed');
+
+      // 4) Third confirm (after alert 1 is closed)
+      const c3 = confirm('Button 2 - Confirm 3: Continue after the alert?');
+      if (c3) {
+        addLog('Button 2: Confirm 3 → OK');
+      } else {
+        addLog('Button 2: Confirm 3 → Cancel');
+      }
+
+      // 5) Fourth confirm (always)
+      const c4 = confirm('Button 2 - Confirm 4: This is the last confirm before the final alert.');
+      if (c4) {
+        addLog('Button 2: Confirm 4 → OK');
+      } else {
+        addLog('Button 2: Confirm 4 → Cancel');
+      }
+
+      // 6) Final alert (always)
+      alert('Button 2 - Alert 2: Final alert in this flow.');
+      addLog('Button 2: Alert 2 → closed');
+    });
+  </script>
+</body>
+</html>
