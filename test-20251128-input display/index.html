@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Input Append Demo</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    #result {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      min-height: 30px;
+    }
+    .item {
+      padding: 5px 0;
+      border-bottom: 1px solid #eee;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Please enter some text</h2>
+
+  <input id="textInput" type="text" placeholder="Type here..." />
+  <button id="okButton">OK</button>
+
+  <div id="result"></div>
+
+  <script>
+    document.getElementById("okButton").addEventListener("click", function() {
+      const text = document.getElementById("textInput").value;
+      if (text.trim() === "") return;
+
+      const div = document.createElement("div");
+      div.className = "item";
+      div.textContent = text;
+
+      document.getElementById("result").appendChild(div);
+      document.getElementById("textInput").value = ""; // clear input
+    });
+  </script>
+
+</body>
+</html>
