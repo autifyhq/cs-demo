@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自動テスト用 - CSVアップロード</title>
+    <style>
+        body { font-family: sans-serif; margin: 40px; line-height: 1.6; }
+        .container { max-width: 500px; border: 1px solid #ccc; padding: 20px; border-radius: 8px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-control { width: 100%; padding: 8px; box-sizing: border-box; }
+        #result-message { margin-top: 15px; font-weight: bold; color: #2c3e50; }
+        button { cursor: pointer; padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>ファイルアップロード テストページ</h2>
+    
+    <form id="test-form">
+        <div class="form-group">
+            <label for="csv-upload">CSVファイルを選択してください:</label>
+            <input 
+                type="file" 
+                id="csv-upload" 
+                name="csv-file"
+                accept=".csv" 
+                class="form-control">
+        </div>
+        
+        <button type="submit" id="submit-button">送信テスト</button>
+    </form>
+
+    <div id="result-message" data-testid="status-message"></div>
+</div>
+
+<script>
+    // 送信ボタンが押された時のダミー動作
+    document.getElementById('test-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const fileInput = document.getElementById('csv-upload');
+        const messageArea = document.getElementById('result-message');
+
+        if (fileInput.files.length > 0) {
+            messageArea.innerText = "成功: " + fileInput.files[0].name + " を受け取りました。";
+            messageArea.style.color = "green";
+        } else {
+            messageArea.innerText = "エラー: ファイルが選択されていません。";
+            messageArea.style.color = "red";
+        }
+    });
+</script>
+
+</body>
+</html>
