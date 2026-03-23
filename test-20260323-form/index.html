@@ -2,106 +2,110 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>Angular Mock Form (Updated Hash)</title>
+    <title>Angular + Ionic Mock Test</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 30px; background-color: #f8f9fa; }
-        .container { 
-            max-width: 500px; 
-            margin: 0 auto; 
-            background: white; 
-            padding: 30px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+        body { font-family: sans-serif; padding: 20px; background-color: #f4f5f8; }
+        .row { display: flex; flex-wrap: wrap; margin-bottom: 1rem; }
+        .mb-3 { margin-bottom: 1rem !important; }
+        .col-md-10 { flex: 0 0 83.33%; max-width: 83.33%; }
+        .col { flex-basis: 0; flex-grow: 1; max-width: 100%; padding-left: 10px; }
+        .form-control, .form-select { 
+            width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; 
         }
-        h2 { color: #495057; font-size: 1.5rem; margin-top: 0; }
+        .text-center { text-align: center; }
+        .mt-3 { margin-top: 1rem; }
+
+        /* Angularの状態クラスによるスタイル */
+        .ng-invalid.ng-touched { border: 1px solid #eb445a !important; }
         
-        /* Angularのフォームスタイル */
-        .form-control {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            font-size: 14px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            box-sizing: border-box;
-            transition: border-color .15s ease-in-out;
-        }
-
-        /* エラー状態のスタイル（左側に赤い縦線） */
-        .form-control.ng-invalid.ng-touched {
-            border-left: 5px solid #e74c3c;
-            border-color: #e74c3c;
-        }
-
-        /* 正常状態のスタイル（左側に緑の縦線） */
-        .form-control.ng-valid {
-            border-left: 5px solid #2ecc71;
-        }
-
-        .error-msg {
-            color: #e74c3c;
-            font-size: 12px;
-            margin-top: 5px;
-            display: none;
-        }
-        .ng-invalid.ng-touched + .error-msg { display: block; }
-
-        button {
-            margin-top: 20px;
-            width: 100%;
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
+        /* Ionicボタンの疑似スタイル */
+        ion-button {
+            --background: #3880ff;
+            display: inline-block;
             cursor: pointer;
         }
-        button:disabled { background-color: #ccc; cursor: not-allowed; }
+        .button-native {
+            background: #3dc2ff; color: white; border: none; padding: 10px 20px;
+            border-radius: 4px; font-weight: bold; cursor: pointer;
+        }
+        .button-native:disabled { background: #ccc; cursor: not-allowed; }
+
+        /* エラーメッセージ用 */
+        app-error-messages { color: #eb445a; font-size: 12px; display: block; min-height: 18px; }
     </style>
 </head>
 <body>
 
-<div class="container" _nghost-ng-c1029384756="">
-    <h2>CSVファイル選択</h2>
-    
-    <label for="csv-input" style="display:block; margin-bottom:8px; font-size:14px;">アップロードするファイルを選んでください</label>
-    
-    <input 
-        _ngcontent-ng-c1029384756="" 
-        type="file" 
-        id="csv-input"
-        accept=".csv" 
-        class="form-control ng-untouched ng-pristine ng-invalid">
-    
-    <div class="error-msg">※ファイルが未選択、または形式が正しくありません。</div>
+<div class="container">
+    <form _ngcontent-ng-c9876543210="" novalidate="" class="ng-untouched ng-pristine ng-invalid">
+        
+        <div _ngcontent-ng-c9876543210="" class="row mb-3">
+            <div _ngcontent-ng-c9876543210="" class="col-md-10">
+                <input _ngcontent-ng-c9876543210="" type="file" id="fileInput" accept=".csv" 
+                       class="form-control ng-untouched ng-pristine ng-invalid">
+                
+                <app-error-messages _ngcontent-ng-c9876543210="" id="errorMsg">
+                    </app-error-messages>
+            </div>
 
-    <button type="button" id="upload-btn" disabled>アップロード開始</button>
+            <div _ngcontent-ng-c9876543210="" class="col">
+                <select _ngcontent-ng-c9876543210="" class="form-select ng-untouched ng-pristine ng-valid">
+                    <option _ngcontent-ng-c9876543210="" value="sjis">SJIS</option>
+                    <option _ngcontent-ng-c9876543210="" value="utf8">UTF8</option>
+                </select>
+            </div>
+        </div>
+
+        <div _ngcontent-ng-c9876543210="" class="text-center">
+            <ion-button _ngcontent-ng-c9876543210="" color="secondary" 
+                        class="ion-color ion-color-secondary md button button-solid ion-activatable ion-focusable hydrated">
+                <button type="button" class="button-native" id="submitBtn" disabled>
+                    <span class="button-inner">
+                        アップロード
+                    </span>
+                </button>
+            </ion-button>
+        </div>
+
+        <div _ngcontent-ng-c9876543210="" class="mt-3">
+            </div>
+    </form>
 </div>
 
 <script>
-    const input = document.getElementById('csv-input');
-    const btn = document.getElementById('upload-btn');
+    const fileInput = document.getElementById('fileInput');
+    const submitBtn = document.getElementById('submitBtn');
+    const errorMsg = document.getElementById('errorMsg');
+    const form = document.querySelector('form');
 
-    // フォーカスが外れた時に「触った(touched)」状態にする
-    input.addEventListener('blur', () => {
-        input.classList.remove('ng-untouched');
-        input.classList.add('ng-touched');
-    });
-
-    // ファイル選択時の挙動
-    input.addEventListener('change', (e) => {
-        input.classList.remove('ng-pristine');
-        input.classList.add('ng-dirty');
+    // ファイル選択時の挙動シミュレーション
+    fileInput.addEventListener('change', (e) => {
+        // ng-pristineを外し、ng-dirtyを付与
+        fileInput.classList.remove('ng-pristine');
+        fileInput.classList.add('ng-dirty');
+        form.classList.remove('ng-pristine');
+        form.classList.add('ng-dirty');
 
         if (e.target.files.length > 0) {
-            input.classList.remove('ng-invalid');
-            input.classList.add('ng-valid');
-            btn.disabled = false;
+            // バリデーション成功
+            fileInput.classList.remove('ng-invalid');
+            fileInput.classList.add('ng-valid');
+            form.classList.remove('ng-invalid');
+            form.classList.add('ng-valid');
+            submitBtn.disabled = false;
+            errorMsg.innerText = "";
         } else {
-            input.classList.remove('ng-valid');
-            input.classList.add('ng-invalid');
-            btn.disabled = true;
+            // バリデーション失敗
+            fileInput.classList.add('ng-invalid');
+            submitBtn.disabled = true;
+            errorMsg.innerText = "ファイルを選択してください。";
         }
+    });
+
+    // フォームに触れた(touched)状態の再現
+    fileInput.addEventListener('blur', () => {
+        fileInput.classList.remove('ng-untouched');
+        fileInput.classList.add('ng-touched');
     });
 </script>
 
