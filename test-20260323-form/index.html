@@ -2,53 +2,105 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>自動テスト用 - CSVアップロード</title>
+    <title>Angular Mock Form (Updated Hash)</title>
     <style>
-        body { font-family: sans-serif; margin: 40px; line-height: 1.6; }
-        .container { max-width: 500px; border: 1px solid #ccc; padding: 20px; border-radius: 8px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        .form-control { width: 100%; padding: 8px; box-sizing: border-box; }
-        #result-message { margin-top: 15px; font-weight: bold; color: #2c3e50; }
-        button { cursor: pointer; padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 30px; background-color: #f8f9fa; }
+        .container { 
+            max-width: 500px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+        }
+        h2 { color: #495057; font-size: 1.5rem; margin-top: 0; }
+        
+        /* Angularのフォームスタイル */
+        .form-control {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            box-sizing: border-box;
+            transition: border-color .15s ease-in-out;
+        }
+
+        /* エラー状態のスタイル（左側に赤い縦線） */
+        .form-control.ng-invalid.ng-touched {
+            border-left: 5px solid #e74c3c;
+            border-color: #e74c3c;
+        }
+
+        /* 正常状態のスタイル（左側に緑の縦線） */
+        .form-control.ng-valid {
+            border-left: 5px solid #2ecc71;
+        }
+
+        .error-msg {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+        .ng-invalid.ng-touched + .error-msg { display: block; }
+
+        button {
+            margin-top: 20px;
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>ファイルアップロード テストページ</h2>
+<div class="container" _nghost-ng-c1029384756="">
+    <h2>CSVファイル選択</h2>
     
-    <form id="test-form">
-        <div class="form-group">
-            <label for="csv-upload">CSVファイルを選択してください:</label>
-            <input 
-                type="file" 
-                id="csv-upload" 
-                name="csv-file"
-                accept=".csv" 
-                class="form-control">
-        </div>
-        
-        <button type="submit" id="submit-button">送信テスト</button>
-    </form>
+    <label for="csv-input" style="display:block; margin-bottom:8px; font-size:14px;">アップロードするファイルを選んでください</label>
+    
+    <input 
+        _ngcontent-ng-c1029384756="" 
+        type="file" 
+        id="csv-input"
+        accept=".csv" 
+        class="form-control ng-untouched ng-pristine ng-invalid">
+    
+    <div class="error-msg">※ファイルが未選択、または形式が正しくありません。</div>
 
-    <div id="result-message" data-testid="status-message"></div>
+    <button type="button" id="upload-btn" disabled>アップロード開始</button>
 </div>
 
 <script>
-    // 送信ボタンが押された時のダミー動作
-    document.getElementById('test-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const fileInput = document.getElementById('csv-upload');
-        const messageArea = document.getElementById('result-message');
+    const input = document.getElementById('csv-input');
+    const btn = document.getElementById('upload-btn');
 
-        if (fileInput.files.length > 0) {
-            messageArea.innerText = "成功: " + fileInput.files[0].name + " を受け取りました。";
-            messageArea.style.color = "green";
+    // フォーカスが外れた時に「触った(touched)」状態にする
+    input.addEventListener('blur', () => {
+        input.classList.remove('ng-untouched');
+        input.classList.add('ng-touched');
+    });
+
+    // ファイル選択時の挙動
+    input.addEventListener('change', (e) => {
+        input.classList.remove('ng-pristine');
+        input.classList.add('ng-dirty');
+
+        if (e.target.files.length > 0) {
+            input.classList.remove('ng-invalid');
+            input.classList.add('ng-valid');
+            btn.disabled = false;
         } else {
-            messageArea.innerText = "エラー: ファイルが選択されていません。";
-            messageArea.style.color = "red";
+            input.classList.remove('ng-valid');
+            input.classList.add('ng-invalid');
+            btn.disabled = true;
         }
     });
 </script>
